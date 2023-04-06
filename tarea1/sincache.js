@@ -24,9 +24,9 @@ async function buscar() {
 }
 
 
-/*function dormir(ms) {
+function dormir(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-}*/
+}
 
 async function llamadas(n) {
   for (let i = 0; i < n; i++) {
