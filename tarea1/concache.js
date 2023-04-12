@@ -1,10 +1,9 @@
-
-
-//  npm lru-cache
+//  npm install lru-cache
 const axios = require('axios');
 const LRU = require('lru-cache');
+const redis = require('redis');
 
-const cache = new LRU({ max: 100 });
+const cache = new LRU({ max: 30 });
 
 function Random(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -12,17 +11,15 @@ function Random(min, max) {
 
 async function buscar(num) {
   try {
-    const cacheKey = `pokemon-${num}`;
+    const cacheKey = `pokemon:${num}`;
     const cachedPokemon = cache.get(cacheKey);
-
     if (cachedPokemon) {
-      console.log(`Obteniendo datos del Pokemon #${num} desde la caché`);
+      console.log(`Recuperando el Pokémon ${num} de la caché.`);
       return cachedPokemon;
     }
-
+    
     const respuesta = await axios.get(`https://pokeapi.co/api/v2/pokemon/${num}`);
     const pokemon = respuesta.data;
-
     cache.set(cacheKey, pokemon);
 
     return pokemon;
@@ -32,9 +29,9 @@ async function buscar(num) {
   }
 }
 
-/*function dormir(ms) {
+function dormir(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-}*/
+}
 
 async function llamadas(n) {
   for (let i = 0; i < n; i++) {
@@ -47,13 +44,14 @@ async function llamadas(n) {
     console.log(`Número de la Pokédex: ${pokemon.id}`);
     console.log(`Tipos: ${pokemon.types.map(tipo => tipo.type.name).join(', ')}`);
     console.log(`Tiempo de consulta: ${fin - inicio} ms`);
-    console.log('--------------');
+    console.log('----------------');
     //await dormir(1000); 
   }
 }
 
-const consultas = 1000; 
+const consultas = 100; 
 llamadas(consultas)
   .catch(error => {
+    
     console.error('Error al realizar consultas', error);
   });

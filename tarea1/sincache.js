@@ -1,4 +1,3 @@
-
 const axios = require('axios');
 
 
@@ -7,10 +6,8 @@ function Random(min, max) {
 }
 
 
-async function buscar() {
+async function buscar(num) {
   try {
-
-    const num = Random(1, 898);
     const respuesta = await axios.get(`https://pokeapi.co/api/v2/pokemon/${num}`);
     const pokemon = respuesta.data;
 
@@ -31,8 +28,9 @@ function dormir(ms) {
 async function llamadas(n) {
   for (let i = 0; i < n; i++) {
     console.log(`Consulta ${i + 1}:`);
+    const num = Random(1, 898);
     const inicio = new Date();
-    const pokemon = await buscar();
+    const pokemon = await buscar(num);
     const fin = new Date();
     console.log(`Nombre: ${pokemon.name}`);
     console.log(`Número de la Pokédex: ${pokemon.id}`);
@@ -42,6 +40,13 @@ async function llamadas(n) {
     //await dormir(1000); 
   }
 }
+
+async function guardarEnRedis(datos, redis) {
+  const client = redis.createClient({ host: 'localhost', port: 6379 });
+  client.set(`pokemon:${datos.id}`, JSON.stringify(datos));
+  client.quit();
+}
+
 
 
 const consultas = 100; 
