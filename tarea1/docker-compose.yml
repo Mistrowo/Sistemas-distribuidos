@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+
+  redis1:
+    image: 'bitnami/redis:7.0.10'
+    ports:
+    - "6379:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_MAXMEMORY_POLICY=allkeys-lru
+    volumes:
+    - ./red1s1:/bitnami/redis/data
+
+  
+  redis2:
+    image: 'bitnami/redis:7.0.10'
+    ports:
+    - "6380:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_MAXMEMORY_POLICY=allkeys-lru
+    volumes:
+    - ./red1s2:/bitnami/redis/data
+  
+  redis3:
+    image: 'bitnami/redis:7.0.10'
+    ports:
+    - "6381:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_MAXMEMORY_POLICY=allkeys-lru
+    volumes:
+    - ./red1s3:/bitnami/redis/data
+  
+
