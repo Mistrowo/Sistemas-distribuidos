@@ -21,9 +21,7 @@ async function buscar(num) {
 }
 
 
-function dormir(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+
 
 async function llamadas(n) {
   for (let i = 0; i < n; i++) {
@@ -37,15 +35,10 @@ async function llamadas(n) {
     console.log(`Tipos: ${pokemon.types.map(tipo => tipo.type.name).join(', ')}`);
     console.log(`Tiempo de consulta: ${fin - inicio} ms`);
     console.log('----------------');
-    //await dormir(1000); 
+   
   }
 }
 
-async function guardarEnRedis(datos, redis) {
-  const client = redis.createClient({ host: 'localhost', port: 6379 });
-  client.set(`pokemon:${datos.id}`, JSON.stringify(datos));
-  client.quit();
-}
 
 
 
