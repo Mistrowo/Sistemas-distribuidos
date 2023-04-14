@@ -1,3 +1,4 @@
+const fs = require('fs');
 const axios = require('axios');
 const Redis = require('ioredis');
 
@@ -16,7 +17,7 @@ const redis3 = new Redis({
   host: 'localhost'
 });
 
-async function buscar(id) {
+async function buscar(id, cacheTimes, apiTimes) {
   try {
     let pokemon;
     let redisInstance;
@@ -31,6 +32,7 @@ async function buscar(id) {
     if (cachedPokemon) {
       console.log(`Encontrado en cache redis ${id} en la instancia ${redisInstance.options.port}`);
       pokemon = JSON.parse(cachedPokemon);
+      cacheTimes.push(Date.now());
     } else {
       console.log(`Cache miss for ${id}`);
       const respuesta = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`);
@@ -41,6 +43,7 @@ async function buscar(id) {
       };
       const pokemonString = JSON.stringify(pokemon);
       await redisInstance.set(`pokemon:${id}`, pokemonString);
+      apiTimes.push(Date.now());
     }
     return pokemon;
   } catch (error) {
@@ -50,18 +53,22 @@ async function buscar(id) {
 }
 
 async function llamadas(n) {
+  const cacheTimes = [];
+  const apiTimes = [];
   for (let i = 0; i < n; i++) {
     console.log(`Consulta ${i + 1}:`);
     const id = Math.floor(Math.random() * 898) + 1;
-    const inicio = new Date();
-    const pokemon = await buscar(id);
-    const fin = new Date();
+    const inicio = Date.now();
+    const pokemon = await buscar(id, cacheTimes, apiTimes);
+    const fin = Date.now();
     console.log(`Nombre: ${pokemon.name}`);
     console.log(`Número de la Pokédex: ${pokemon.id}`);
     console.log(`Tipos: ${pokemon.types.join(', ')}`);
     console.log(`Tiempo de consulta: ${fin - inicio} ms`);
     console.log('--------------');
   }
+  fs.writeFileSync('cache.txt', cacheTimes.join('\n'));
+  fs.writeFileSync('api.txt', apiTimes.join('\n'));
 }
 
 const consultas = 200; 
