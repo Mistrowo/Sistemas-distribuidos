@@ -16,3 +16,4 @@ plt.xlabel('Consultas')
 plt.ylabel('Tiempo (ms)')
 plt.title('Tiempos de consulta')
 plt.show()
+

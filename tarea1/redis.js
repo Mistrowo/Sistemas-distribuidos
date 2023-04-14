@@ -21,12 +21,16 @@ async function buscar(id, cacheTimes, apiTimes) {
   try {
     let pokemon;
     let redisInstance;
+    let ttl;
     if (id <= 299) {
       redisInstance = redis1;
+      ttl = 3600; // 1 hour TTL for pokemon <= 299
     } else if (id <= 598) {
       redisInstance = redis2;
+      ttl = 1800; // 30 minutes TTL for pokemon <= 598
     } else {
       redisInstance = redis3;
+      ttl = 900; // 15 minutes TTL for pokemon > 598
     }
     const cachedPokemon = await redisInstance.get(`pokemon:${id}`);
     if (cachedPokemon) {
@@ -42,7 +46,7 @@ async function buscar(id, cacheTimes, apiTimes) {
         types: respuesta.data.types.map(tipo => tipo.type.name)
       };
       const pokemonString = JSON.stringify(pokemon);
-      await redisInstance.set(`pokemon:${id}`, pokemonString);
+      await redisInstance.set(`pokemon:${id}`, pokemonString, 'EX', ttl);
       apiTimes.push(Date.now());
     }
     return pokemon;
