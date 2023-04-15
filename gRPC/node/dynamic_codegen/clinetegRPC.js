@@ -35,12 +35,16 @@ function main() {
   } else {
     user = Random(1,898)/*'mundo'*/; // numero que se genera para hacer la peticion al server
   }
+
+  const startTime = performance.now(); // Tomar el tiempo de inicio antes de hacer la llamada al servidor
   client.sayHello({name: user}, function(err, response) {
     console.log('Greeting:', response.message);
   });
 }
 
-for(let i = 0; i<10;i++){
-  main();
+for(let i = 0; i<1000;i++){
+  setTimeout(() => {
+    main();
+  }, i * 100); // espera i segundos antes de llamar a main()
 }
 
