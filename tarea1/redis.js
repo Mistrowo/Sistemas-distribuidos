@@ -80,7 +80,7 @@ async function llamadas(n) {
   });
 }
 
-const consultas = 200;
+const consultas = 1000;
 llamadas(consultas)
   .catch(error => {
     console.error('Error al realizar consultas', error);
