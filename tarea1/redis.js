@@ -17,7 +17,7 @@ const redis3 = new Redis({
   host: 'localhost'
 });
 
-async function buscar(id, cacheTimes, apiTimes) {
+async function buscar(id) {
   try {
     let pokemon;
     let redisInstance;
@@ -36,7 +36,7 @@ async function buscar(id, cacheTimes, apiTimes) {
     if (cachedPokemon) {
       console.log(`Encontrado en cache redis ${id} en la instancia ${redisInstance.options.port}`);
       pokemon = JSON.parse(cachedPokemon);
-      cacheTimes.push(Date.now());
+      
     } else {
       console.log(`Cache miss for ${id}`);
       const respuesta = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`);
@@ -47,7 +47,7 @@ async function buscar(id, cacheTimes, apiTimes) {
       };
       const pokemonString = JSON.stringify(pokemon);
       await redisInstance.set(`pokemon:${id}`, pokemonString, 'EX', ttl);
-      apiTimes.push(Date.now());
+     
     }
     return pokemon;
   } catch (error) {
@@ -57,25 +57,30 @@ async function buscar(id, cacheTimes, apiTimes) {
 }
 
 async function llamadas(n) {
-  const cacheTimes = [];
-  const apiTimes = [];
+  const hola = [];
+  
   for (let i = 0; i < n; i++) {
     console.log(`Consulta ${i + 1}:`);
     const id = Math.floor(Math.random() * 898) + 1;
     const inicio = Date.now();
-    const pokemon = await buscar(id, cacheTimes, apiTimes);
+    const pokemon = await buscar(id);
     const fin = Date.now();
+    const tiempofinal=fin-inicio
+    hola.push(tiempofinal)
     console.log(`Nombre: ${pokemon.name}`);
     console.log(`Número de la Pokédex: ${pokemon.id}`);
     console.log(`Tipos: ${pokemon.types.join(', ')}`);
     console.log(`Tiempo de consulta: ${fin - inicio} ms`);
+    
     console.log('--------------');
   }
-  fs.writeFileSync('cache.txt', cacheTimes.join('\n'));
-  fs.writeFileSync('api.txt', apiTimes.join('\n'));
+  fs.writeFile('tiemposredis.txt', hola.join('\n'), (err) => {
+    if (err) throw err;
+    console.log('Los tiempos de consulta han sido guardados en el archivo tiempos.txt');
+  });
 }
 
-const consultas = 200; 
+const consultas = 1000;
 llamadas(consultas)
   .catch(error => {
     console.error('Error al realizar consultas', error);

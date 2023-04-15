@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 # Lee los tiempos de consulta desde un archivo txt
-with open('tiempos.txt', 'r') as f:
+with open('tiemposredis.txt', 'r') as f:
     tiempos = [float(line.strip()) for line in f]
 
 # Crea una lista de números de consulta para el eje x
