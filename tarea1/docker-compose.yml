@@ -8,10 +8,9 @@ services:
     - "6379:6379"
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
-      - REDIS_MAX_MEMORY=9mb
-      - REDIS_MAXMEMORY_POLICY=allkeys-lru
     volumes:
     - ./red1s1:/bitnami/redis/data
+    command: "/opt/bitnami/scripts/redis/run.sh --maxmemory 5mb --maxmemory-policy allkeys-lru"
 
   
   redis2:
@@ -20,20 +19,19 @@ services:
     - "6380:6379"
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
-      - REDIS_MAX_MEMORY=9mb
-      - REDIS_MAXMEMORY_POLICY=allkeys-lru
     volumes:
     - ./red1s2:/bitnami/redis/data
+    command: "/opt/bitnami/scripts/redis/run.sh --maxmemory 5mb --maxmemory-policy allkeys-lru"
   
   redis3:
     image: 'bitnami/redis:7.0.10'
     ports:
     - "6381:6379"
+    
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
-      - REDIS_MAX_MEMORY=9mb
-      - REDIS_MAXMEMORY_POLICY=allkeys-lru
     volumes:
     - ./red1s3:/bitnami/redis/data
+    command: "/opt/bitnami/scripts/redis/run.sh --maxmemory 5mb --maxmemory-policy allkeys-lru"
   
 
