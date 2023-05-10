@@ -72,13 +72,13 @@ async function llamadas(n) {
   }
   const tasaEficiencia = consultasEnCache / consultasTotales;
   console.log(`Tasa de eficiencia de caché: ${tasaEficiencia}`);
-  fs.writeFile('tiempos2.txt', tiempos.join('\n'), (err) => {
+  fs.writeFile('tiempos4.txt', tiempos.join('\n'), (err) => {
     if (err) throw err;
-    console.log('Los tiempos de consulta han sido guardados en el archivo tiempos.txt');
+    console.log('Los tiempos de consulta han sido guardados en el archivo tiempos4.txt');
   });
 }
 
-const consultas = 100;
+const consultas = 1000;
 llamadas(consultas)
   .catch(error => {
     console.error('Error al realizar consultas', error);
