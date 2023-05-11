@@ -30,4 +30,10 @@ async function startSendingData(deviceId, deltaT, dataSize) {
   }, deltaT * 1000);
 }
 
-startSendingData(0, 5, 10); // se envian  datos desde el dispositivo 0 cada 5 segundos con un tamaño de 10
+async function simulateIoTDevices(n, deltaT, dataSize) {
+  for (let i = 0; i < n; i++) {
+    startSendingData(i, deltaT, dataSize);
+  }
+}
+
+simulateIoTDevices(5, 10, 10); // simular 5 dispositivos enviando datos cada 10 segundos con un tamaño de 10
