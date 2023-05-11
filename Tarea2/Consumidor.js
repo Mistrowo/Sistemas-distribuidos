@@ -1,26 +1,28 @@
-function Consumer(onMessage) {
-    this.onMessage = onMessage;
-  }
-  
-  Consumer.prototype.start = function() {
-    // Aquí se podría abrir una conexión a un servidor que envía los mensajes
-    // o hacer polling a una API REST, pero por simplicidad simplemente generamos mensajes aleatorios
-    setInterval(() => {
-      const timestamp = Date.now();
-      const deviceId = Math.floor(Math.random() * 3); // Generamos un ID de dispositivo aleatorio entre 0 y 2
-      const value = generatePayload(Math.floor(Math.random() * 100)); // Generamos un payload aleatorio
-      const data = { timestamp, value };
-      const message = { deviceId, data };
-      this.onMessage(message);
-    }, 1000);
-  };
-  
-  function generatePayload(payloadSize) {
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const payload = [];
-    for (let i = 0; i < payloadSize; i++) {
-      payload.push(chars.charAt(Math.floor(Math.random() * chars.length)));
-    }
-    return { data: payload.join('') };
-  }
-  
+const Kafka = require('kafkajs');
+
+// Configuración del cliente de Kafka
+const kafka = new Kafka({
+  clientId: 'iot-consumer',
+  brokers: ['localhost:9092']
+});
+
+// Creación del consumidor
+const consumer = kafka.consumer({ groupId: 'iot-group' });
+
+// Función que inicia el consumidor y se suscribe al tópico 'iot-topic'
+async function runConsumer() {
+  await consumer.connect();
+  console.log('Connected to Kafka broker');
+  await consumer.subscribe({ topic: 'iot-topic', fromBeginning: true });
+
+  // Función que se ejecuta cada vez que se recibe un mensaje del tópico
+  await consumer.run({
+    eachMessage: async ({ topic, partition, message }) => {
+      const messageContent = JSON.parse(message.value.toString());
+      console.log(`Received message from device ${messageContent.deviceId}: ${messageContent.message}`);
+    },
+  });
+}
+
+// Ejecutar el consumidor
+runConsumer();
