@@ -47,5 +47,5 @@ async function runProducer(numDevices, interval, messageSize) {
     simulateDevice(i, interval, messageSize);
   }
 }
-// Ejecutar el productor
+// Ejecutar el productor 3 dispositivos, con un intervalo de 1ms y el tamaño del mensaje 10 
 runProducer(3, 1000, 10);
