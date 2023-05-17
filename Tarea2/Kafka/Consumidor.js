@@ -4,7 +4,7 @@ const { Kafka } = require('kafkajs');
 // Configuración del cliente de Kafka
 const kafka = new Kafka({
   clientId: 'iot-consumer',
-  brokers: ['localhost:9092']
+  brokers: ['localhost:9093']
 });
 
 // Creación del consumidor

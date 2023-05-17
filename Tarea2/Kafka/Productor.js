@@ -1,16 +1,12 @@
 const { Kafka } = require('kafkajs');
 
-
-// Configuración del cliente de Kafka
 const kafka = new Kafka({
   clientId: 'iot-producer',
-  brokers: ['localhost:9092']
+  brokers: ['9092:9092']
 });
 
-// Creación del productor
 const producer = kafka.producer();
 
-// Función para generar un mensaje aleatorio en formato JSON
 function generateMessage(deviceId, messageSize) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let message = '';
@@ -19,13 +15,13 @@ function generateMessage(deviceId, messageSize) {
     message += characters.charAt(randomIndex);
   }
   return {
-    deviceId: deviceId,
     timestamp: Date.now(),
-    message: message
+    value: {
+      data: message
+    }
   };
 }
 
-// Función que envía un mensaje al tópico 'iot-topic'
 async function sendMessage(deviceId, messageSize) {
   const message = generateMessage(deviceId, messageSize);
   await producer.send({
@@ -34,10 +30,9 @@ async function sendMessage(deviceId, messageSize) {
       { value: JSON.stringify(message) }
     ]
   });
-  console.log(`Device ${deviceId} sent message: ${JSON.stringify(message)}`);
+  console.log(`Device ${deviceId} sending: ${JSON.stringify(message)}`);
 }
 
-// Función que simula un dispositivo IoT enviando mensajes cada cierto tiempo
 async function simulateDevice(deviceId, interval, messageSize, numIterations) {
   for (let i = 0; i < numIterations; i++) {
     await sendMessage(deviceId, messageSize);
@@ -45,14 +40,12 @@ async function simulateDevice(deviceId, interval, messageSize, numIterations) {
   }
 }
 
-// Función que inicia el productor y comienza a simular dispositivos IoT
 async function runProducer(numDevices, interval, messageSize) {
   await producer.connect();
   console.log('Connected to Kafka broker');
   for (let i = 0; i < numDevices; i++) {
-    simulateDevice(i, interval, messageSize, 10); // Cambia el último argumento según tus necesidades
+    simulateDevice(i, interval, messageSize, 10);
   }
 }
 
-// Ejecutar el productor con 3 dispositivos, un intervalo de 1ms y un tamaño de mensaje de 10
-runProducer(3, 1000, 10);
+runProducer(3, 5000, 10);
