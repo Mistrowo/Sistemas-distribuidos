@@ -1,4 +1,5 @@
-const Kafka = require('kafkajs');
+const { Kafka } = require('kafkajs');
+
 
 // Configuración del cliente de Kafka
 const kafka = new Kafka({
