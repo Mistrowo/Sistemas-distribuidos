@@ -1,4 +1,4 @@
-const IoTDevice = require('./producer');
+const IoTDevice = require('./dataytime');
 const KafkaProducer = require('./kafka_producer');
 const KafkaConsumer = require('./kafka_consumer');
 
