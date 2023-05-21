@@ -1,14 +1,21 @@
+const axios = require('axios')
 const IoTDevice = require('./dataytime');
-const KafkaProducer = require('./kafka_producer');
-const KafkaConsumer = require('./kafka_consumer');
 
 const n = 3; // Number of devices
 const dt = 5000; // Time interval in milliseconds
-const topic = 'iot_data';
 
 const devices = [];
-const kafkaProducer = new KafkaProducer(topic);
-const kafkaConsumer = new KafkaConsumer(topic);
+
+const sendMessage = async (message) => {
+  try {
+    const response = await axios.post('http://localhost:3000/messages', {
+      message: message
+    });
+    console.log(response.data);
+  } catch (error) {
+    console.error('Error sending message:', error.message);
+  }
+};
 
 for (let i = 0; i < n; i++) {
   const device = new IoTDevice(i, dt);
@@ -18,8 +25,9 @@ for (let i = 0; i < n; i++) {
 
 devices.forEach((device) => {
   device.on('data', (message) => {
-    kafkaProducer.send(message);
+    // Llamada a la función para enviar un mensaje
+    sendMessage(message);
   });
 });
 
-kafkaConsumer.receive();
+
