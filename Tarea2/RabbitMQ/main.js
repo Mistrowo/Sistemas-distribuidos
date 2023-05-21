@@ -1,4 +1,4 @@
-const IoTDevice = require('./producer');
+const IoTDevice = require('./dataytime');
 const RabbitMQProducer = require('./rabbitmq_producer');
 const RabbitMQConsumer = require('./rabbitmq_consumer')
 
