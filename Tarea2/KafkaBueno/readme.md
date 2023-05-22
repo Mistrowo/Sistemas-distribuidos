@@ -19,7 +19,7 @@ Sigue los pasos a continuación para ejecutar los componentes de Kafka y los con
 
 1. Abre una terminal y navega hasta la ubicación del archivo `docker-compose.yml`.
 2. Ejecuta el siguiente comando para iniciar los servicios de Kafka en segundo plano:
-   ´docker-compose up --build´
+   `docker-compose up --build`
 3. Espera unos segundos para que los servicios de Kafka se inicien correctamente.
 
 ¡Ahora deberías ver los mensajes enviados por el productor y consumidos por el consumidor en la consola!
