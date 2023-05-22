@@ -24,9 +24,9 @@ def create_producer():
     return producer
 
 
-def producer(producer, topic):
+def producer(id, topic):
     producer = create_producer()
-
+    time.sleep(id)
     while True:
         datasize = random.randint(2, 15)
         message = {
@@ -35,13 +35,13 @@ def producer(producer, topic):
                 'data': ''.join(random.choice('abcdefghijklmnopqrstuvwxyz123456789') for _ in range(datasize))
             }
         }
-        producer.produce(topic, key=str(producer), value=json.dumps(
+        producer.produce(topic, key=str(id), value=json.dumps(
             message), callback=delivery_report)
         producer.flush()
 
-        print(f'Device {producer} sending: {json.dumps(message)}')
+        print(f'Device {id} sending: {json.dumps(message)}')
 
-        time.sleep(7)
+        time.sleep(5)
 
 
 if __name__ == '__main__':
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     threads = []
 
     for i in range(N):
-        thread = Thread(target=producer, args=(producer, topic[i % 3]))
+        thread = Thread(target=producer, args=(i, topic[i % 3]))
         thread.start()
         threads.append(thread)
 

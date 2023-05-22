@@ -5,22 +5,23 @@ from threading import Thread
 M = 30
 
 
-def consumer(topic):
+def consumer(id, topic):
     consumer = Consumer({
         'bootstrap.servers': 'kafka:9092',
-        'group.id': 'my-group',
+        'group.id': id,
         'auto.offset.reset': 'earliest'
     })
     consumer.subscribe([topic])
 
     while True:
         try:
-            msg = consumer.poll(1.0)
+            msg = consumer.poll(0.25)
             if msg is None:
                 continue
             if msg.error():
                 raise KafkaException(msg.error())
-            print(f"Consumed message: {msg.value().decode('utf-8')}")
+            print(
+                f"Consumed {id} message topic {topic}: {msg.value().decode('utf-8')}")
         except KeyboardInterrupt:
             break
 
@@ -33,7 +34,8 @@ if __name__ == '__main__':
     threads = []
 
     for i in range(M):
-        thread = Thread(target=consumer, args=(topic[i % 3]))
+        # Agregar una coma para crear una tupla de un solo elemento
+        thread = Thread(target=consumer, args=(i, topic[i % 3]))
         thread.start()
         threads.append(thread)
 
