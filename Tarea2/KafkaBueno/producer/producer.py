@@ -2,7 +2,8 @@ from confluent_kafka import Producer
 import json
 import time
 import random
-from threading import Thread
+from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
 
 N = 10  # Número de productores
 delay = 7  # Retardo de 7 segundos
@@ -24,7 +25,7 @@ def create_producer():
     return producer
 
 
-def producer(id, topic):
+def producer(id, topic, lock):
     producer = create_producer()
     time.sleep(id)
     while True:
@@ -35,25 +36,26 @@ def producer(id, topic):
                 'data': ''.join(random.choice('abcdefghijklmnopqrstuvwxyz123456789') for _ in range(datasize))
             }
         }
-        producer.produce(topic, key=str(id), value=json.dumps(
-            message), callback=delivery_report)
-        producer.flush()
 
-        print(f'Device {id} sending: {json.dumps(message)}')
+        # Adquirir el bloqueo antes de enviar el mensaje
+        with lock:
+            producer.produce(topic, key=str(id), value=json.dumps(
+                message), callback=delivery_report)
+            producer.flush()
 
-        time.sleep(5)
+            print(f'Device {id} sending: {json.dumps(message)}')
+
+        # Agregar un tiempo de espera antes de enviar el siguiente mensaje
+        time.sleep(delay)
 
 
 if __name__ == '__main__':
     # Cambia el nombre del tópico según tus necesidades
     topic = ['topic1', 'topic2', 'topic3']
-    threads = []
+    lock = Lock()
+    executor = ThreadPoolExecutor(max_workers=N)
 
     for i in range(N):
-        thread = Thread(target=producer, args=(i, topic[i % 3]))
-        thread.start()
-        threads.append(thread)
+        executor.submit(producer, i, topic[i % 3], lock)
 
-    # Espera a que todos los hilos terminen
-    for thread in threads:
-        thread.join()
+    executor.shutdown(wait=True)
