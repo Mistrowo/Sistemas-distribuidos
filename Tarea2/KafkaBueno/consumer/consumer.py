@@ -1,8 +1,9 @@
 from confluent_kafka import Consumer, KafkaException
 import random
+import time
 from concurrent.futures import ThreadPoolExecutor
 
-M = 30
+M = 3
 
 
 def consumer(id, topic):
@@ -32,6 +33,7 @@ if __name__ == '__main__':
     # Cambia el nombre del tópico según tus necesidades
     topic = ['topic1', 'topic2', 'topic3']
     executor = ThreadPoolExecutor(max_workers=M)
+    time.sleep(10)
 
     for i in range(M):
         executor.submit(consumer, i, topic[i % 3])

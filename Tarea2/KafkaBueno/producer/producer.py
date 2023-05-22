@@ -5,8 +5,8 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 
-N = 10  # Número de productores
-delay = 7  # Retardo de 7 segundos
+N = 3  # Número de productores
+delay = 5  # Retardo de 7 segundos
 
 
 def delivery_report(err, msg):
@@ -27,7 +27,6 @@ def create_producer():
 
 def producer(id, topic, lock):
     producer = create_producer()
-    time.sleep(id)
     while True:
         datasize = random.randint(2, 15)
         message = {
@@ -45,15 +44,13 @@ def producer(id, topic, lock):
 
             print(f'Device {id} sending: {json.dumps(message)}')
 
-        # Agregar un tiempo de espera antes de enviar el siguiente mensaje
-        time.sleep(delay)
-
 
 if __name__ == '__main__':
     # Cambia el nombre del tópico según tus necesidades
     topic = ['topic1', 'topic2', 'topic3']
     lock = Lock()
     executor = ThreadPoolExecutor(max_workers=N)
+    time.sleep(10)
 
     for i in range(N):
         executor.submit(producer, i, topic[i % 3], lock)
