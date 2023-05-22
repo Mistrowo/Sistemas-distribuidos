@@ -5,8 +5,9 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 
-N = 3  # Número de productores
+N = 30  # Número de productores
 delay = 5  # Retardo de 7 segundos
+contador = 0
 
 
 def delivery_report(err, msg):
@@ -26,6 +27,7 @@ def create_producer():
 
 
 def producer(id, topic, lock):
+    global contador
     producer = create_producer()
     while True:
         datasize = random.randint(2, 15)
@@ -35,14 +37,19 @@ def producer(id, topic, lock):
                 'data': ''.join(random.choice('abcdefghijklmnopqrstuvwxyz123456789') for _ in range(datasize))
             }
         }
+        producer.produce(topic, key=str(id), value=json.dumps(
+            message), callback=delivery_report)
+        producer.flush()
+
+        print(f'Device {id} sending: {json.dumps(message)}')
 
         # Adquirir el bloqueo antes de enviar el mensaje
         with lock:
-            producer.produce(topic, key=str(id), value=json.dumps(
-                message), callback=delivery_report)
-            producer.flush()
-
-            print(f'Device {id} sending: {json.dumps(message)}')
+            contador += 1
+            if contador > N:
+                # Rafaga cada 2 segundos
+                time.sleep(2)
+                contador = 0
 
 
 if __name__ == '__main__':
