@@ -4,6 +4,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 M = 3
+topics = 1
 
 
 def consumer(id, topic):
@@ -22,7 +23,7 @@ def consumer(id, topic):
             if msg.error():
                 raise KafkaException(msg.error())
             print(
-                f"Consumed {id} message topic {topic}: {msg.value().decode('utf-8')}")
+                f"Consumed {id} message {topic}: {msg.value().decode('utf-8')}")
         except KeyboardInterrupt:
             break
 
@@ -31,11 +32,11 @@ def consumer(id, topic):
 
 if __name__ == '__main__':
     # Cambia el nombre del tópico según tus necesidades
-    topic = ['topic1', 'topic2', 'topic3']
+    topic = ['topic1', 'topic2', 'topic3', 'topic4', 'topic5']
     executor = ThreadPoolExecutor(max_workers=M)
     time.sleep(10)
 
     for i in range(M):
-        executor.submit(consumer, i, topic[i % 3])
+        executor.submit(consumer, i, topic[i % topics])
 
     executor.shutdown(wait=True)

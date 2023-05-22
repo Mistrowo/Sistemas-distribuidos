@@ -6,8 +6,8 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 
 N = 30  # Número de productores
-delay = 5  # Retardo de 7 segundos
 contador = 0
+topics = 1
 
 
 def delivery_report(err, msg):
@@ -54,12 +54,12 @@ def producer(id, topic, lock):
 
 if __name__ == '__main__':
     # Cambia el nombre del tópico según tus necesidades
-    topic = ['topic1', 'topic2', 'topic3']
+    topic = ['topic1', 'topic2', 'topic3', 'topic4', 'topic5']
     lock = Lock()
     executor = ThreadPoolExecutor(max_workers=N)
     time.sleep(10)
 
     for i in range(N):
-        executor.submit(producer, i, topic[i % 3], lock)
+        executor.submit(producer, i, topic[i % topics], lock)
 
     executor.shutdown(wait=True)
