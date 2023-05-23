@@ -1,32 +1,43 @@
 import pika
 import random
-import threading
-import os
+import time
+from concurrent.futures import ThreadPoolExecutor
 
-NUM_CONSUMERS = int(os.environ.get('NUM_CONSUMERS', '15'))
+M = 3
 
-def callback(channel, method, properties, body):
-    print(body)
-
-def consumer_thread(topic):
-    connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
+def consumer(id, topic):
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host='rabbitmq'))
     channel = connection.channel()
 
-    channel.queue_declare(queue=topic)
-    channel.basic_consume(queue=topic, on_message_callback=callback, auto_ack=True)
+    channel.exchange_declare(exchange=topic, exchange_type='fanout')
 
-    channel.start_consuming()
+    result = channel.queue_declare(queue='', exclusive=True)
+    queue_name = result.method.queue
 
-def main():
-    threads = []
-    for _ in range(NUM_CONSUMERS):
-        topic = f'topic{random.randint(1, 3)}'
-        thread = threading.Thread(target=consumer_thread, args=(topic,))
-        threads.append(thread)
-        thread.start()
+    channel.queue_bind(exchange=topic, queue=queue_name)
 
-    for thread in threads:
-        thread.join()
+    print(f'Consumer {id} waiting for messages in topic {topic}. To exit press CTRL+C')
+
+    def callback(ch, method, properties, body):
+        print(f"Consumed {id} message topic {topic}: {body.decode('utf-8')}")
+
+    channel.basic_consume(
+        queue=queue_name, on_message_callback=callback, auto_ack=True)
+
+    try:
+        channel.start_consuming()
+    except KeyboardInterrupt:
+        channel.stop_consuming()
+        connection.close()
 
 if __name__ == '__main__':
-    main()
+    # Cambia el nombre del tópico según tus necesidades
+    topic = ['topic1', 'topic2', 'topic3']
+    executor = ThreadPoolExecutor(max_workers=M)
+    time.sleep(10)
+
+    for i in range(M):
+        executor.submit(consumer, i, topic[i % 3])
+
+    executor.shutdown(wait=True)

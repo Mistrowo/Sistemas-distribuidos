@@ -2,8 +2,9 @@ FROM python:3.9
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir pika==1.2.0
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 COPY producer.py .
 
-CMD [ "python", "producer.py" ]
+CMD ["python", "producer.py"]

@@ -2,8 +2,9 @@ FROM python:3.9
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir requirements.txt
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 COPY consumer.py .
 
-CMD [ "python", "consumer.py" ]
+CMD ["python", "consumer.py"]

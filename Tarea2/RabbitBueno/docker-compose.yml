@@ -1,20 +1,34 @@
-version: '3'
 services:
   rabbitmq:
-    image: bitnami/rabbitmq:latest
+    image: rabbitmq:latest
     ports:
-      - '5672:5672'
-      - '15672:15672'
-    environment:
-      - RABBITMQ_USERNAME=user
-      - RABBITMQ_PASSWORD=bitnami
-
-  producer:
-    build: ./producer
-    depends_on:
-      - rabbitmq
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - rabbitmq_network
 
   consumer:
-    build: ./consumer
+    build:
+      context: ./consumer
+      dockerfile: Dockerfile
     depends_on:
       - rabbitmq
+    networks:
+      - rabbitmq_network
+
+  producer:
+    build:
+      context: ./producer
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+    networks:
+      - rabbitmq_network
+
+networks:
+  rabbitmq_network:
+
+volumes:
+  rabbitmq_data:
