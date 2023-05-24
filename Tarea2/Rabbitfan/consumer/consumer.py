@@ -4,13 +4,15 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 M = 3
+nombre = 1
+exchange_type = 'fanout'  # Cambia esto a 'direct' o 'topic' parabar otros patrones de intercambio
 
 def consumer(id, topic):
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(host='rabbitmq'))
     channel = connection.channel()
 
-    channel.exchange_declare(exchange=topic, exchange_type='fanout')
+    channel.exchange_declare(exchange=topic, exchange_type=exchange_type)
 
     result = channel.queue_declare(queue='', exclusive=True)
     queue_name = result.method.queue
@@ -32,12 +34,11 @@ def consumer(id, topic):
         connection.close()
 
 if __name__ == '__main__':
-    # Cambia el nombre del tópico según tus necesidades
-    topic = ['topic1', 'topic2', 'topic3']
+    exchange_name = ['exchange1', 'exchange2', 'exchange3', 'exchange4', 'exchange5']
     executor = ThreadPoolExecutor(max_workers=M)
     time.sleep(10)
 
     for i in range(M):
-        executor.submit(consumer, i, topic[i % 3])
+        executor.submit(consumer, i, exchange_name[i % nombre])
 
     executor.shutdown(wait=True)

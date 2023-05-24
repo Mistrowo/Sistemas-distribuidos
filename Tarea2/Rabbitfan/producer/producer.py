@@ -1,13 +1,14 @@
-import pika
 import json
 import time
 import random
+import pika
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 
-N = 3  # Número de productores
-delay = 5  # Retardo de 5 segundos
-
+N = 1000  # Número de productores
+contador = 0
+nombre = 1
+exchange_type = 'fanout'  # Cambia esto a 'fanout'
 
 def create_producer():
     connection = pika.BlockingConnection(
@@ -15,10 +16,9 @@ def create_producer():
     channel = connection.channel()
     return channel
 
-
 def producer(id, topic, lock):
     channel = create_producer()
-    channel.exchange_declare(exchange=topic, exchange_type='fanout')
+    channel.exchange_declare(exchange=topic, exchange_type=exchange_type)
 
     while True:
         datasize = random.randint(2, 15)
@@ -28,24 +28,26 @@ def producer(id, topic, lock):
                 'data': ''.join(random.choice('abcdefghijklmnopqrstuvwxyz123456789') for _ in range(datasize))
             }
         }
-
-        # Adquirir el bloqueo antes de enviar el mensaje
+        
+        channel.basic_publish(exchange=topic, routing_key='', body=json.dumps(message))  # Elimina la clave de enrutamiento
+        print(f'Device {id} sending: {json.dumps(message)}')
+        global contador
         with lock:
-            channel.basic_publish(exchange=topic, routing_key='',
-                                  body=json.dumps(message))
-            print(f'Device {id} sending: {json.dumps(message)}')
-
-        time.sleep(0)
-
+            contador += 1
+            if contador > N:
+                time.sleep(2)
+                contador = 0
 
 if __name__ == '__main__':
-    # Cambia el nombre del tópico según tus necesidades
-    topic = ['topic1', 'topic2', 'topic3']
+    exchange_name = ['exchange1', 'exchange2', 'exchange3', 'exchange4', 'exchange5']
     lock = Lock()
     executor = ThreadPoolExecutor(max_workers=N)
     time.sleep(10)
 
     for i in range(N):
-        executor.submit(producer, i, topic[i % 3], lock)
+        executor.submit(producer, i, exchange_name[i % nombre], lock)
 
     executor.shutdown(wait=True)
+
+
+    
