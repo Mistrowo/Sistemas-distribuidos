@@ -1,5 +1,5 @@
-import json
 import pika
+import json
 import time
 import random
 from concurrent.futures import ThreadPoolExecutor
@@ -7,19 +7,18 @@ from threading import Lock
 
 N = 30  # Número de productores
 contador = 0
-nombre = 1
-exchange_type = 'topic'  # Cambia esto a 'direct' o 'topic' para pro otros patrones de intercambio
+topics = 1
 
 def create_producer():
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(host='rabbitmq'))
     channel = connection.channel()
+    channel.exchange_declare(exchange='topic_logs', exchange_type='topic')
     return channel
 
 def producer(id, topic, lock):
+    global contador
     channel = create_producer()
-    channel.exchange_declare(exchange=topic, exchange_type=exchange_type)
-
     while True:
         datasize = random.randint(2, 15)
         message = {
@@ -28,26 +27,31 @@ def producer(id, topic, lock):
                 'data': ''.join(random.choice('abcdefghijklmnopqrstuvwxyz123456789') for _ in range(datasize))
             }
         }
-        routing_key = ''
-        
-        if exchange_type == 'topic':
-            routing_key = f'topic_key.{id}'  # Añade una clave de enrutamiento única para cada productor
-        
-        channel.basic_publish(exchange=topic, routing_key=routing_key, body=json.dumps(message))
+        channel.basic_publish(
+            exchange='topic_logs',
+            routing_key=topic,
+            body=json.dumps(message)
+        )
+
         print(f'Device {id} sending: {json.dumps(message)}')
-        global contador
+
+        # Adquirir el bloqueo antes de enviar el mensaje
         with lock:
             contador += 1
             if contador > N:
+                # Rafaga cada 2 segundos
                 time.sleep(2)
                 contador = 0
 
 if __name__ == '__main__':
-   topic = ['topic1', 'topic2', 'topic3', 'topic4', 'topic5']
-   executor = ThreadPoolExecutor(max_workers=N)
-   time.sleep(10)
+    # Cambia el nombre del tópico según tus necesidades
+    topic = ['topic1', 'topic2', 'topic3', 'topic4', 'topic5']
+    lock = Lock()
+    executor = ThreadPoolExecutor(max_workers=N)
+    time.sleep(10)
 
-   for i in range(N):
-        executor.submit(producer, i, topic[i % nombre])
+    for i in range(N):
+        executor.submit(producer, i, topic[i % topics], lock)
 
-   executor.shutdown(wait=True)
+    executor.shutdown(wait=True)
+
