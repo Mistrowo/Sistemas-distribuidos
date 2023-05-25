@@ -1,16 +1,16 @@
 import matplotlib.pyplot as plt
 
 # Datos de las tres tablas
-tiempo = [1, 2, 5]
+tiempo = [0, 0.5, 1,1.5, 2]
 
-cpu1 = [1.9, 2.1, 2.35]
-cpu2 = [17, 19, 22]
-cpu3 = [30, 38, 41.5]
+cpu1 = [149, 61.65, 36.22,50.78,29.82]
+cpu2 = [130.61, 87.43, 66.08,57.45,52.87]
+cpu3 = [125.09, 74.35, 30.11,76.97,96.86]
 
 # Graficar los datos
-plt.plot(tiempo, cpu1, marker='o', label='RabbitMQ 1 minutos')
-plt.plot(tiempo, cpu2, marker='o', label='RabbitMQ 2 minutos')
-plt.plot(tiempo, cpu3, marker='o', label='RabbitMQ 5 minutos')
+plt.plot(tiempo, cpu1, marker='o', label='Kafka')
+plt.plot(tiempo, cpu2, marker='o', label='Rabbit con patron fanout')
+plt.plot(tiempo, cpu3, marker='o', label='Rabbit con patron topic')
 
 # Personalizar la gráfica
 plt.xlabel('Tiempo')

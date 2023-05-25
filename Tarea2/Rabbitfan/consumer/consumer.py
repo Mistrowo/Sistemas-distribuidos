@@ -3,7 +3,7 @@ import random
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-M = 3
+M = 300
 nombre = 1
 exchange_type = 'fanout'  # Cambia esto a 'direct' o 'topic' parabar otros patrones de intercambio
 

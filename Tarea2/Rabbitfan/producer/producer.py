@@ -5,7 +5,7 @@ import pika
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 
-N = 1000  # Número de productores
+N = 50 # Número de productores
 contador = 0
 nombre = 1
 exchange_type = 'fanout'  # Cambia esto a 'fanout'

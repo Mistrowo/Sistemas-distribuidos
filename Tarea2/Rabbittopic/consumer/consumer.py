@@ -3,8 +3,8 @@ import random
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-M = 3
-topics = 1
+M = 300
+topics = 5
 
 def consumer(id, topic):
     connection = pika.BlockingConnection(

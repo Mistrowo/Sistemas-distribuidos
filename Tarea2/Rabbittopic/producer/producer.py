@@ -5,9 +5,9 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 
-N = 30  # Número de productores
+N = 50 # Número de productores
 contador = 0
-topics = 1
+topics = 5
 
 def create_producer():
     connection = pika.BlockingConnection(
